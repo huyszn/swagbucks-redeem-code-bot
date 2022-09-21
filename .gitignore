@@ -1,0 +1,6 @@
+.DS_Store
+feed.xml
+tst*.py
+cookies.pkl
+config.py
+__pycache__
