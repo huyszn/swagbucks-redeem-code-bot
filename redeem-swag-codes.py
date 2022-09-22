@@ -53,13 +53,14 @@ class ReadSBCodezRss:
         Get posts only from today
         """
         # DEFAULT WORKS FOR 'US'
-        # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
+        # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
         country_filter = ['CA', 'UK', 'AU']
-        print(f'Filtering out {country_filter[0]}, {country_filter[1]}, and {country_filter[2]} codes...')
+        country = 'US'
+        print(f'Filtering out {country_filter[0]}, {country_filter[1]}, and {country_filter[2]} while keeping {country} and iSPY codes for today...')
         for post in posts:
             try:
-                # keep only US current date posts
-                if search(country_filter[0], post.find('title').get_text()) or search(country_filter[1], post.find('title').get_text()) or search(country_filter[2], post.find('title').get_text()) or bool(search(day, post.find('title').get_text())) == False:
+                # keep only 'country' and iSPY current date posts
+                if ((search(country_filter[0], post.find('title').get_text()) or search(country_filter[1], post.find('title').get_text()) or search(country_filter[2], post.find('title').get_text())) and (bool(search(country, post.find('title').get_text())) == False)) and bool(search('iSPY', post.find('title').get_text())) == False or bool(search(day, post.find('title').get_text())) == False:
                     post.decompose()
             except ValueError:
                 continue
