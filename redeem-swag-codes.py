@@ -193,7 +193,8 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
         if text.replace(',','').lower() == 'swagbutton':
             SwagButton = True  
         # detect the swag code
-        if text[:len(main_code)] == main_code.upper():
+        #if text[:len(main_code)] == main_code.upper():
+        if text[:len(main_code)].isupper() and text[:len(main_code)] != 'SWAG' and text[:len(main_code)] != 'CODE' and text[:len(main_code)] != 'ALERT!':
             swag_offer_code = text
             print('FOUND SWAG CODE:', swag_offer_code)
 
