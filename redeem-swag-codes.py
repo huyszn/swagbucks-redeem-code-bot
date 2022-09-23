@@ -1,4 +1,4 @@
-import requests, pickle, warnings, config
+import requests, pickle, warnings, config, bs4
 from bs4 import BeautifulSoup
 from bs4.builder import XMLParsedAsHTMLWarning
 from re import search
@@ -7,6 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import JavascriptException
 from time import sleep
@@ -29,9 +30,14 @@ class ReadSBCodezRss:
     """
     The ReadSBCodezRSS object scrapes the Swag Codes and their links from the RSS feed
     """
-    def __init__(self, url, headers):
+    def __init__(self, url: str, headers: dict):
         """
         Initiate ReadSBCodezRss object and compute its attributes
+
+        Parameters
+        ----------
+        @url: str: SBCodez RSS Feed URL
+        @headers: dict: Headers for GET request for URL
         """
         self.url = url
         self.headers = headers
@@ -48,9 +54,18 @@ class ReadSBCodezRss:
         self.codes = self.get_codes(self.today_posts)
         self.code_links = self.get_today_posts_links(self.today_posts)
 
-    def get_today_posts(self, posts, day):
+    def get_today_posts(self, posts: bs4.element.ResultSet, day: str) -> bs4.element.ResultSet:
         """
         Get posts only from today
+
+        Parameters
+        ----------
+        @posts: bs4.element.ResultSet: ResultSet of all most recent posts
+        @day: str: day from today's date with comma at the end (Ex. '22,')
+        
+        Returns
+        -------
+        @posts: bs4.element.ResultSet: ResultSet of today's posts
         """
         # DEFAULT WORKS FOR 'US'
         # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
@@ -66,9 +81,17 @@ class ReadSBCodezRss:
                 continue
         return posts
     
-    def get_today_posts_links(self, posts):
+    def get_today_posts_links(self, posts: bs4.element.ResultSet) -> list:
         """
         Get code location links from today's posts
+
+        Parameters
+        ----------
+        @posts: bs4.element.ResultSet: ResultSet of today's posts
+        
+        Returns
+        -------
+        @links: list[str]: List of links from today's posts
         """
         links = []
         for post in posts:
@@ -81,9 +104,17 @@ class ReadSBCodezRss:
                 links.append('N/A')
         return links
     
-    def get_codes(self, posts):
+    def get_codes(self, posts: bs4.element.ResultSet) -> list:
         """
         Get Swag Codes from posts
+
+        Parameters
+        ----------
+        @posts: bs4.element.ResultSet: ResultSet of today's posts
+        
+        Returns
+        -------
+        @codes: list[str]: List of Swag Codes from today's posts
         """
         bold = []
         codes = []
@@ -95,9 +126,15 @@ class ReadSBCodezRss:
         codes = list(dict.fromkeys(codes))
         return codes
 
-def login_SB(email, password, driver):
+def login_SB(email: str, password: str, driver: WebDriver):
     """
     Login to swagbucks.com in the driver
+
+    Parameters
+    ----------
+    @email: str: Email of your Swagbucks account
+    @password: str: Email of your Swagbucks account
+    @driver: WebDriver: Instance of the chrome driver
     """
     # load cookies into Swagbucks if cookies.pkl is detected
     try:
@@ -122,9 +159,18 @@ def login_SB(email, password, driver):
     finally:
         sleep(3)
 
-def get_swag_code_offer_page(code, link):
+def get_swag_code_offer_page(code: str, link: str) -> str:
     """
     Get the Swag Code from the offer page link
+
+    Parameters
+    ----------
+    @code: str: Main part of the Swag Code without the 'XXXX'
+    @code: str: Link of the offer page
+
+    Returns
+    -------
+    @swag_offer_code: str: Swag Code from the offer page
     """
     driver.get(link)
     html = driver.page_source
@@ -177,9 +223,14 @@ def get_swag_code_offer_page(code, link):
             return swag_offer_code
     return swag_offer_code
 
-def redeem_swag_code(code, offer=True):
+def redeem_swag_code(code: str, offer: bool=True):
     """
     Redeem the Swag Code on swagbucks.com
+
+    Parameters
+    ----------
+    @code: str: Swag Code
+    @offer: bool: True if the link is an offer page. False if the link is not an offer page
     """
     # print information about code that is not an offer-page code
     if offer == False:
