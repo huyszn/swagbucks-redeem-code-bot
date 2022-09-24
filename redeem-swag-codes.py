@@ -184,7 +184,6 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
     Box = False
     Mobile_App = False
     SwagButton = False
-    Swagcode = False
     idx = 0
     for text in description_split:
         # remove punctuation and new line characters
@@ -202,9 +201,7 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
         # detect Swag Code in CA/UK/AU
         if COUNTRY in {'CA', 'UK', 'AU'}:
             if text == 'Swagcode':
-                Swagcode = True
-            if Swagcode and text != '':
-                swag_offer_code = text
+                swag_offer_code = description_split[idx+2].replace('\n','')
                 print('FOUND SWAG CODE:', swag_offer_code)
                 break
         # detect Swag Code in US
