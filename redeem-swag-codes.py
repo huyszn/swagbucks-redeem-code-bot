@@ -1,4 +1,4 @@
-import requests, pickle, warnings, config, bs4
+import requests, pickle, warnings, config, bs4, string
 from bs4 import BeautifulSoup
 from bs4.builder import XMLParsedAsHTMLWarning
 from re import search
@@ -185,16 +185,18 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
     Mobile_App = False
     SwagButton = False
     for text in description_split:
+        # remove punctuation and new line characters
+        text = text.translate(str.maketrans('', '', string.punctuation))
+        text = text.replace('\n','')
         # detect if box, app, and/or swagbutton is in the description
-        if text.replace(',','').lower() == 'box':
+        if text.lower() == 'box':
             Box = True
-        if text.replace(',','').lower() == 'app':
+        if text.lower() == 'app':
             Mobile_App = True
-        if text.replace(',','').lower() == 'swagbutton':
+        if text.lower() == 'swagbutton':
             SwagButton = True  
         # detect the swag code
-        #if text[:len(main_code)] == main_code.upper():
-        if text[:len(main_code)].isupper() and text[:len(main_code)] != 'SWAG' and text[:len(main_code)] != 'CODE' and text[:len(main_code)] != 'ALERT!':
+        if text[:len(main_code)].isupper() and text[:len(main_code)] != 'SWAG' and text[:len(main_code)] != 'CODE' and text[:len(main_code)] != 'ALERT' and text[:len(main_code)] != 'SB' and text[:len(main_code)] != 'ET':
             swag_offer_code = text
             print('FOUND SWAG CODE:', swag_offer_code)
 
