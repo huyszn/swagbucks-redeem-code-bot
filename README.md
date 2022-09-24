@@ -29,12 +29,12 @@ Replace the `EMAIL` and `PASSWORD` fields with your account email and password.
 
 ### Country Filter
 The bot defaults to getting and redeeming only US codes.\
-If you want to redeem codes from another country, then change the list values in `country_filter` and the value in `country`\
-The `country_filter` list and `country` variable are under the `get_today_posts` function.\
+If you want to redeem codes from another country, then change the list values in `COUNTRY_FILTER` and the value in `COUNTRY`\
+The `country_filter` list and `country` variable are located in the beginning of the `redeem-swag-codes.py` file.\
 For example, this code snippet below gets only UK codes.
 ```
-country_filter = ['CA', 'US', 'AU']
-country = 'UK'
+COUNTRY_FILTER = ['CA', 'US', 'AU']
+COUNTRY = 'UK'
 ```
 
 

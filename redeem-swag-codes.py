@@ -25,6 +25,10 @@ headers = {
 }
 URL = "https://sbcodez.com/feed/"
 SWAGBUCKS_URL = "https://www.swagbucks.com/"
+# DEFAULT WORKS FOR 'US'
+# REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
+COUNTRY_FILTER = ['CA', 'UK', 'AU']
+COUNTRY = 'US'
 
 class ReadSBCodezRss:
     """
@@ -67,15 +71,11 @@ class ReadSBCodezRss:
         -------
         @posts: bs4.element.ResultSet: ResultSet of today's posts
         """
-        # DEFAULT WORKS FOR 'US'
-        # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
-        country_filter = ['CA', 'UK', 'AU']
-        country = 'US'
-        print(f'Filtering out {country_filter[0]}, {country_filter[1]}, and {country_filter[2]} while keeping {country} and iSPY codes for today...')
+        print(f'Filtering out {COUNTRY_FILTER[0]}, {COUNTRY_FILTER[1]}, and {COUNTRY_FILTER[2]} while keeping {COUNTRY} and iSPY codes for today...')
         for post in posts:
             try:
                 # keep only 'country' and iSPY current date posts
-                if ((search(country_filter[0], post.find('title').get_text()) or search(country_filter[1], post.find('title').get_text()) or search(country_filter[2], post.find('title').get_text())) and (bool(search(country, post.find('title').get_text())) == False)) and bool(search('iSPY', post.find('title').get_text())) == False or bool(search(day, post.find('title').get_text())) == False:
+                if ((search(COUNTRY_FILTER[0], post.find('title').get_text()) or search(COUNTRY_FILTER[1], post.find('title').get_text()) or search(COUNTRY_FILTER[2], post.find('title').get_text())) and (bool(search(COUNTRY, post.find('title').get_text())) == False)) and bool(search('iSPY', post.find('title').get_text())) == False or bool(search(day, post.find('title').get_text())) == False:
                     post.decompose()
             except ValueError:
                 continue
@@ -184,10 +184,14 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
     Box = False
     Mobile_App = False
     SwagButton = False
+    Swagcode = False
+    idx = 0
     for text in description_split:
         # remove punctuation and new line characters
         text = text.translate(str.maketrans('', '', string.punctuation))
         text = text.replace('\n','')
+        # strip whitespace
+        text = text.strip()
         # detect if box, app, and/or swagbutton is in the description
         if text.lower() == 'box':
             Box = True
@@ -195,31 +199,41 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
             Mobile_App = True
         if text.lower() == 'swagbutton':
             SwagButton = True  
-        # detect the swag code
-        if text[:len(main_code)].isupper() and text[:len(main_code)] != 'SWAG' and text[:len(main_code)] != 'CODE' and text[:len(main_code)] != 'ALERT' and text[:len(main_code)] != 'SB' and text[:len(main_code)] != 'ET':
-            swag_offer_code = text
-            print('FOUND SWAG CODE:', swag_offer_code)
-
-    # no swag code found
+        # detect Swag Code in CA/UK/AU
+        if COUNTRY in {'CA', 'UK', 'AU'}:
+            if text == 'Swagcode':
+                Swagcode = True
+            if Swagcode and text != '':
+                swag_offer_code = text
+                print('FOUND SWAG CODE:', swag_offer_code)
+                break
+        # detect Swag Code in US
+        else:
+            if text == 'Enter':
+                swag_offer_code = description_split[idx+1]
+                print('FOUND SWAG CODE:', swag_offer_code)
+                break
+        idx += 1
+    # no Swag Code found
     if swag_offer_code == '':
         print(f'Swag Code {code} is already redeemed or expired')
         return swag_offer_code
     else:
-        # if swag code box is described
+        # if Swag Code box is described
         if Box:
             print(f'Swag Code {swag_offer_code} can be entered on the website')
             return swag_offer_code
-        # if both mobile app AND swagbutton, but not swag code box is described
+        # if both Mobile App AND SwagButton, but not Swag Code box is described
         elif Mobile_App and SwagButton and (Box == False):
             print(f'Swag Code {swag_offer_code} can only be entered on the Mobile App or SwagButton')
             swag_offer_code = 'm/b'
             return swag_offer_code
-        # if ONLY mobile app is described
+        # if ONLY Mobile App is described
         elif Mobile_App and (SwagButton == False) and (Box == False):
             print(f'Swag Code {swag_offer_code} can only be entered on the Mobile App')
             swag_offer_code = 'm'
             return swag_offer_code
-        # if ONLY swagbutton is described
+        # if ONLY SwagButton is described
         elif (Mobile_App == False) and SwagButton and (Box == False):
             print(f'Swag Code {swag_offer_code} can only be entered on SwagButton')
             swag_offer_code = 'b'
@@ -277,7 +291,7 @@ def main():
         elif search('offer-page', code_link_dict[code]):
             print(f'DETECTED OFFER PAGE for {code}')
             swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
-            # if Swag Code is not empty or a mobileapp / swagbutton code
+            # if Swag Code is not empty or a Mobile App / SwagButton code
             if swag_offer_code != '' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
                 redeem_swag_code(swag_offer_code, offer=True)
 
