@@ -2,7 +2,22 @@
 
 A bot that scrapes Swag Codes found on sbcodez.com and redeems them on swagbucks.com. The bot currently does not automatically redeem Mobile App / SwagButton extension only Swag Codes. You can copy these codes printed from terminal and enter them in the Mobile App and/or the SwagButton extension.
 
-![Console output](images/console.png)
+## Examples
+
+![Console output Swag Code Box](images/Console%20-%20Swag%20Code%20Box.png)
+
+<p align="center">
+  <b>Swag Code Box Non-Offer-Page Swag Code</b>
+</p>
+
+
+![Console output SwagButton](images/Console%20-%20SwagButton.png)
+
+<p align="center">
+  <b>SwagButton Offer-Page Swag Code</b>
+</p>
+
+
 
 
 ## Setup the bot
