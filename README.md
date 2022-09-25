@@ -17,27 +17,23 @@ A bot that scrapes Swag Codes found on sbcodez.com and redeems them on swagbucks
   <b>SwagButton Offer-Page Swag Code</b>
 </p>
 
-
-
-
 ## Setup the bot
 
 ### Requirements
 
-```
-$ pip install -r requirements.txt
+Clone this repository, cd into it, and install dependencies:
+```sh
+git clone https://github.com/huyszn/swagbucks-redeem-code-bot.git
+cd swagbucks-redeem-code-bot
+pip install -r requirements.txt
 ```
 
 ### config.py
 
-```
-$ touch config.py
-```
-Copy the contents of `config-example.py` into `config.py`.
-
-```
-EMAIL = "your email"
-PASSWORD = "your password"
+Copy the contents of `config-example.py` into a new file `config.py`.
+```sh
+touch config.py
+cp config-example.py config.py
 ```
 
 Replace the `EMAIL` and `PASSWORD` fields with your account email and password.
@@ -55,8 +51,8 @@ COUNTRY = 'UK'
 
 ## Run the bot
 
-```
-$ python3 redeem-swag-codes.py
+```sh
+python3 redeem-swag-codes.py
 ```
 
 ## License
