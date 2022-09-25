@@ -165,18 +165,16 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
 
     Parameters
     ----------
-    @code: str: Main part of the Swag Code without the 'XXXX'
-    @code: str: Link of the offer page
+    @code: str: Swag Code with the 'XXXX'
+    @link: str: Link of the offer page
 
     Returns
     -------
-    @swag_offer_code: str: Swag Code from the offer page
+    @swag_offer_code: str: Swag Code without the 'XXXX' from the offer page
     """
     driver.get(link)
     html = driver.page_source
     soup = BeautifulSoup(html, features='html.parser')
-    # code without the 'XXXX' at the end
-    main_code = code.split('XXXX')[0]
     # get description of the offer page
     description = soup.find('div', {'id': 'ofDesc'}).get_text()
     description_split = description.split(' ')
