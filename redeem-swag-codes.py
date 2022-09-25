@@ -266,7 +266,11 @@ def redeem_swag_code(code: str, offer: bool=True):
         driver.implicitly_wait(2)
         driver.execute_script("document.getElementById('swag-code__submitCta--FSc8Q').click();")
         driver.implicitly_wait(2)
-        print(f'Redeemed the Swag Code (unknown if successful or not. Read the above message for more details): {code}')
+        try:
+            message = driver.find_element(By.CLASS_NAME, 'banner__description--uBErz').text
+            print(f'{message} SWAG CODE: {code}')
+        except:
+            print(f'Error retrieving SwagBucks response message after redeeming Swag Code: {code}')
     except JavascriptException:
         print(f'Error redeeming the Swag Code: {code}')
 
