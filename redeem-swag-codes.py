@@ -9,7 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import JavascriptException
+from selenium.common.exceptions import JavascriptException, NoSuchElementException
 from time import sleep
 
 warnings.filterwarnings('ignore', category=XMLParsedAsHTMLWarning)
@@ -269,8 +269,8 @@ def redeem_swag_code(code: str, offer: bool=True):
         try:
             message = driver.find_element(By.CLASS_NAME, 'banner__description--uBErz').text
             print(f'{message} SWAG CODE: {code}')
-        except:
-            print(f'Error retrieving SwagBucks response message after redeeming Swag Code: {code}')
+        except NoSuchElementException:
+            print(f'Error retrieving Swagbucks response message after redeeming Swag Code: {code}')
     except JavascriptException:
         print(f'Error redeeming the Swag Code: {code}')
 
