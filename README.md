@@ -36,8 +36,12 @@ touch config.py
 cp config-example.py config.py
 ```
 
-Replace the `EMAIL` and `PASSWORD` fields with your account email and password.
+Replace the `EMAIL` and `PASSWORD` fields with your account email and password in `config.py`.
 
+```
+EMAIL = "your email"
+PASSWORD = "your password"
+```
 ### Country Filter
 The bot defaults to getting and redeeming only US codes.\
 If you want to redeem codes from another country, then change the list values in `COUNTRY_FILTER` and the value in `COUNTRY`\
