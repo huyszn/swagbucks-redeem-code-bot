@@ -184,44 +184,50 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
     Box = False
     Mobile_App = False
     SwagButton = False
-    idx = 0
-    for text in description_split:
-        # remove punctuation and new line characters
-        text = text.translate(str.maketrans('', '', string.punctuation))
-        text = text.replace('\n','')
-        # strip whitespace
-        text = text.strip()
-        # detect if box, app, and/or swagbutton is in the description
-        if text.lower() == 'box':
-            Box = True
-        if text.lower() == 'app':
-            Mobile_App = True
-        if text.lower() == 'swagbutton':
-            SwagButton = True  
-        # detect Swag Code in CA/UK/AU
-        if COUNTRY in {'CA', 'UK', 'AU'}:
-            if text == 'Swagcode':
-                swag_offer_code = description_split[idx+2].replace('\n','')
-                print('FOUND SWAG CODE:', swag_offer_code)
-                break
-        # detect Swag Code in US
-        else:
-            if text == 'Enter':
-                swag_offer_code = description_split[idx+1]
-                print('FOUND SWAG CODE:', swag_offer_code)
-                break
-        idx += 1
-    # no Swag Code found
-    if swag_offer_code == '':
-        print(f'Swag Code {code} is already redeemed or expired')
+    # remove punctuation and new line characters
+    description_split = list(map(lambda text:text.translate(str.maketrans('', '', string.punctuation)), description_split))
+    description_split = list(map(lambda text:text.replace('\n',''), description_split))
+    # strip whitespace
+    description_split = list(map(lambda text:text.strip(), description_split))
+    # make description_split lowercase to detect if box, app, and/or swagbutton is in the description
+    description_split_lower = list(map(lambda text:text.lower(), description_split))
+    try:
+        description_split_lower.index('swag')
+        description_split_lower.index('code')
+        description_split_lower.index('box')
+        Box = True
+    except ValueError:
+        pass
+    try:
+        description_split_lower.index('mobile')
+        description_split_lower.index('app')
+        Mobile_App = True
+    except ValueError:
+        pass
+    try:
+        description_split_lower.index('swagbutton')
+        SwagButton = True
+    except ValueError:
+        pass
+    # detect Swag Code in CA/UK/AU
+    if COUNTRY in {'CA', 'UK', 'AU'}:
+        swag_offer_code = description_split[description_split.index('Swagcode')+2]
+        print('FOUND SWAG CODE:', swag_offer_code)
+    # detect Swag Code in US
+    else:
+        swag_offer_code = description_split[description_split.index('Enter')+1]
+        print('FOUND SWAG CODE:', swag_offer_code)
+    # Swag Code is expired
+    if swag_offer_code == 'EXPIRED':
+        print(f'Swag Code {code} is expired')
+        return swag_offer_code
+    # Swag Code is already redeemed
+    elif swag_offer_code == 'This':
+        print(f'Swag Code {code} is already redeemed or not available in your country')
         return swag_offer_code
     else:
-        # if Swag Code box is described
-        if Box:
-            print(f'Swag Code {swag_offer_code} can be entered on the website')
-            return swag_offer_code
         # if both Mobile App AND SwagButton, but not Swag Code box is described
-        elif Mobile_App and SwagButton and (Box == False):
+        if Mobile_App and SwagButton and (Box == False):
             print(f'Swag Code {swag_offer_code} can only be entered on the Mobile App or SwagButton')
             swag_offer_code = 'm/b'
             return swag_offer_code
@@ -235,7 +241,10 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
             print(f'Swag Code {swag_offer_code} can only be entered on SwagButton')
             swag_offer_code = 'b'
             return swag_offer_code
-    return swag_offer_code
+        # Swag Code box is described or nothing (CA/UK/AU)
+        else:
+            print(f'Swag Code {swag_offer_code} can be entered on the website')
+            return swag_offer_code
 
 def redeem_swag_code(code: str, offer: bool=True):
     """
@@ -288,8 +297,8 @@ def main():
         elif search('offer-page', code_link_dict[code]):
             print(f'DETECTED OFFER PAGE for {code}')
             swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
-            # if Swag Code is not empty or a Mobile App / SwagButton code
-            if swag_offer_code != '' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
+            # if Swag Code is expired, already redeemed, or a Mobile App / SwagButton code
+            if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
                 redeem_swag_code(swag_offer_code, offer=True)
 
 
