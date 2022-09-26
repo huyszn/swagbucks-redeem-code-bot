@@ -18,6 +18,7 @@ options = Options()
 # Headless chrome = True
 options.headless = True
 driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+driver.implicitly_wait(2)
 
 
 headers = {
@@ -269,14 +270,10 @@ def redeem_swag_code(code: str, offer: bool=True):
         print(f'{code} is a code that can be entered anywhere.')
     try:
         driver.execute_script("document.getElementById('sbUserMenuToggle').click();")
-        driver.implicitly_wait(2)
         driver.execute_script("document.getElementById('sbMainNavUserMenuSwagCodeCta').click();")
         #driver.execute_script(f"document.getElementById('swag-code__input--QEQ0m').value = '{code}';")
-        driver.implicitly_wait(2)
         driver.find_element(By.ID, 'swag-code__input--QEQ0m').send_keys(code)
-        driver.implicitly_wait(2)
         driver.execute_script("document.getElementById('swag-code__submitCta--FSc8Q').click();")
-        driver.implicitly_wait(2)
         try:
             message = driver.find_element(By.CLASS_NAME, 'banner__description--uBErz').text
             print(f'{message} SWAG CODE: {code}')
