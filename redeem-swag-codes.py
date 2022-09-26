@@ -1,4 +1,4 @@
-import requests, pickle, warnings, config, bs4, string
+import requests, pickle, warnings, config, bs4, string, argparse
 from bs4 import BeautifulSoup
 from bs4.builder import XMLParsedAsHTMLWarning
 from re import search
@@ -29,6 +29,14 @@ SWAGBUCKS_URL = "https://www.swagbucks.com/"
 # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
 COUNTRY_FILTER = ['CA', 'UK', 'AU']
 COUNTRY = 'US'
+
+# Parse arguments
+parser = argparse.ArgumentParser(description='Redeem Swag Codes found on sbcodez.com on swagbucks.com.')
+parser.add_argument('--hourly', action='store_true', help='Redeem Swag Codes found on sbcodez.com every hour.', required=False)
+args = parser.parse_args()
+HOURLY = False
+if args.hourly:
+    HOURLY = args.hourly
 
 class ReadSBCodezRss:
     """
@@ -100,7 +108,7 @@ class ReadSBCodezRss:
                     codeLocation = post.find('span', {'class': 'codeLocation'})
                     link = codeLocation.find('a')['href']
                     links.append(link)
-            except:
+            except AttributeError:
                 links.append('N/A')
         return links
     
@@ -221,7 +229,10 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
         return swag_offer_code
     # Swag Code is already redeemed
     elif swag_offer_code == 'This':
-        print(f'Swag Code {code} is already redeemed or not available in your country')
+        print(f'Swag Code {code} is not available in your country')
+        return swag_offer_code
+    elif swag_offer_code == 'You':
+        print(f'Swag Code {code} is already redeemed')
         return swag_offer_code
     else:
         # if both Mobile App AND SwagButton, but not Swag Code box is described
@@ -280,7 +291,8 @@ def main():
     """
     feed = ReadSBCodezRss(URL, headers)
     if feed.codes == []:
-        raise Exception('No new Swag codes have been posted today yet')
+        print('No new Swag codes have been posted today yet')
+        return
     print('CODES FOUND:', feed.codes)
     print('LINKS FOUND:',feed.code_links)
 
@@ -300,9 +312,29 @@ def main():
             print(f'DETECTED OFFER PAGE for {code}')
             swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
             # if Swag Code is expired, already redeemed, or a Mobile App / SwagButton code
-            if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
+            if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'You' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
                 redeem_swag_code(swag_offer_code, offer=True)
 
 
 if __name__ == '__main__':
-    main()
+    if HOURLY:
+        while True:
+            # Keep running the bot until you stop the bot or some unknown error occurs
+            try:
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Fetching sbcodez.com for Swag Codes...")
+                main()
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Finished running bot this iteration. Fetching again for Swag Codes in 1 hour...")
+                # run again in 1 hour
+                sleep(3600)
+            # Ctrl+C to exit bot
+            except KeyboardInterrupt:
+                print('\nExiting bot...')
+                break
+            # Exit bot if some unknown error occurs
+            except Exception as e:
+                print(e)
+                print('An error occurred. Exiting bot...')
+                break
+    else:
+        # run once
+        main()

@@ -55,9 +55,18 @@ COUNTRY = 'UK'
 
 ## Run the bot
 
+If you want to run the bot once:
 ```sh
 python3 redeem-swag-codes.py
 ```
+
+If you want to run the bot every hour:
+```sh
+python3 redeem-swag-codes.py --hourly
+```
+To stop the bot, press <kbd>CTRL</kbd>+<kbd>C</kbd> / <kbd>Control</kbd>+<kbd>C</kbd> on your keyboard in the terminal window.\
+I recommend you run the bot with the hourly argument in the afternoon (12pm) in your local time and stop the bot at around the evening (7pm) in your local time.
+
 
 ## License
 
