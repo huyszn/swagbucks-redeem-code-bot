@@ -64,6 +64,13 @@ If you want to run the bot every hour:
 ```sh
 python3 redeem-swag-codes.py --hourly
 ```
+
+![Console output hourly argument](images/Console%20-%20Redeem%20Swag%20Code%20Hourly.png)
+
+<p align="center">
+  <b>Swag Code Redeemed with --hourly Argument</b>
+</p>
+
 To stop the bot, press <kbd>CTRL</kbd>+<kbd>C</kbd> / <kbd>Control</kbd>+<kbd>C</kbd> on your keyboard in the terminal window.\
 I recommend you run the bot with the hourly argument in the afternoon (12pm) in your local time and stop the bot at around the evening (7pm) in your local time.
 
