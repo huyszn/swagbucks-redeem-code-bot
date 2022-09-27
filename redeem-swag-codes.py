@@ -233,7 +233,7 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
         print(f'Swag Code {code} is not available in your country')
         return swag_offer_code
     elif swag_offer_code == 'You':
-        print(f'Swag Code {code} is already redeemed')
+        print(f'Swag Code {code} has already been redeemed')
         return swag_offer_code
     else:
         # if both Mobile App AND SwagButton, but not Swag Code box is described
@@ -295,7 +295,9 @@ def main():
 
     code_link_dict = {feed.codes[i]: feed.code_links[i] for i in range(len(feed.codes))}
     #print(code_link_dict)
-    login_SB(config.EMAIL,config.PASSWORD, driver)
+    # Login to Swagbucks/ Load cookies in main function if --hourly argument is not passed
+    if not HOURLY:
+        login_SB(config.EMAIL,config.PASSWORD, driver)
 
     # go through all Swag Codes and try to redeem them
     for code in code_link_dict.keys():
@@ -315,6 +317,8 @@ def main():
 
 if __name__ == '__main__':
     if HOURLY:
+        # Login to Swagbucks/ Load cookies once if --hourly argument is passed
+        login_SB(config.EMAIL,config.PASSWORD, driver)
         while True:
             # Keep running the bot until you stop the bot or some unknown error occurs
             try:
