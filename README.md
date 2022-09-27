@@ -67,6 +67,24 @@ python3 redeem-swag-codes.py --hourly
 To stop the bot, press <kbd>CTRL</kbd>+<kbd>C</kbd> / <kbd>Control</kbd>+<kbd>C</kbd> on your keyboard in the terminal window.\
 I recommend you run the bot with the hourly argument in the afternoon (12pm) in your local time and stop the bot at around the evening (7pm) in your local time.
 
+<div align="center">
+
+### **Normal Swag Code Schedule (US)**
+
+| Day of the Week  | Number of Swag Codes |
+| :---: | :---: |
+| Sunday  | One Swag Code  |
+| Monday  | Two Swag Codes  |
+| Tuesday  | One Swag Code  |
+| Wednesday  | One Swag Code  |
+| Thursday  | One SwagButton Swag Code  |
+| Friday  | Two Swag Codes  |
+| Saturday  | One Swag Code  |
+
+There is a iSPY code once a week between Monday-Friday.
+
+</div>
+
 
 ## License
 
