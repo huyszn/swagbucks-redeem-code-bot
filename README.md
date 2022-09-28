@@ -71,6 +71,7 @@ python3 redeem-swag-codes.py --hourly
   <b>Swag Code Redeemed with --hourly Argument</b>
 </p>
 
+The bot notifies you if it finds a Swag Code that has already been redeemed during the time it has been running.\
 To stop the bot, press <kbd>CTRL</kbd>+<kbd>C</kbd> / <kbd>Control</kbd>+<kbd>C</kbd> on your keyboard in the terminal window.\
 I recommend you run the bot with the hourly argument in the afternoon (12pm) in your local time and stop the bot at around the evening (7pm) in your local time.
 
