@@ -31,6 +31,8 @@ SWAGBUCKS_URL = "https://www.swagbucks.com/"
 # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
 COUNTRY_FILTER = ['CA', 'UK', 'AU']
 COUNTRY = 'US'
+# list of already redeemed Swag Codes when --hourly argument is passed
+REDEEMED = []
 
 console = Console()
 
@@ -304,18 +306,25 @@ def main():
 
     # go through all Swag Codes and try to redeem them
     for code in code_link_dict.keys():
-        if search('facebook', code_link_dict[code]) or search('twitter', code_link_dict[code]):
-            # non-offer-page Swag Code
-            console.print(f'DETECTED FACEBOOK / TWITTER / ISPY / EXTRAVAGANZA CODE for [bold green]{code}[/bold green]', style='magenta')
-            driver.get(SWAGBUCKS_URL)
-            sleep(2)
-            redeem_swag_code(code, offer=False)
-        elif search('offer-page', code_link_dict[code]):
-            console.print(f'DETECTED OFFER PAGE for [bold green]{code}[/bold green]', style='magenta2')
-            swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
-            # if Swag Code is expired, already redeemed, or a Mobile App / SwagButton code
-            if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'You' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
-                redeem_swag_code(swag_offer_code, offer=True)
+        # check if Swag Code has already been redeemed
+        if code in REDEEMED and HOURLY:
+            console.print(f'Swag Code [bold green]{code}[/bold green] has already been redeemed earlier during the time this bot has been running', style='orange1')
+        else:
+            if search('facebook', code_link_dict[code]) or search('twitter', code_link_dict[code]):
+                # non-offer-page Swag Code
+                console.print(f'DETECTED FACEBOOK / TWITTER / ISPY / EXTRAVAGANZA CODE for [bold green]{code}[/bold green]', style='magenta')
+                driver.get(SWAGBUCKS_URL)
+                sleep(2)
+                redeem_swag_code(code, offer=False)
+                REDEEMED.append(code)
+            elif search('offer-page', code_link_dict[code]):
+                # offer-page Swag Code
+                console.print(f'DETECTED OFFER PAGE for [bold green]{code}[/bold green]', style='magenta2')
+                swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
+                # if Swag Code is expired, already redeemed, or a Mobile App / SwagButton code
+                if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'You' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
+                    redeem_swag_code(swag_offer_code, offer=True)
+                    REDEEMED.append(code)
 
 
 if __name__ == '__main__':
