@@ -11,6 +11,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import JavascriptException, NoSuchElementException
 from time import sleep
+from rich.console import Console
 
 warnings.filterwarnings('ignore', category=XMLParsedAsHTMLWarning)
 
@@ -30,6 +31,8 @@ SWAGBUCKS_URL = "https://www.swagbucks.com/"
 # REPLACE ONE OF THE VALUES FOR THE country_filter LIST WITH 'US' AND REPLACE 'US' WITH YOUR COUNTRY IN country IF YOU WANT THE BOT TO WORK FOR A DIFFERENT COUNTRY
 COUNTRY_FILTER = ['CA', 'UK', 'AU']
 COUNTRY = 'US'
+
+console = Console()
 
 # Parse arguments
 parser = argparse.ArgumentParser(description='Redeem Swag Codes found on sbcodez.com on swagbucks.com.')
@@ -80,7 +83,7 @@ class ReadSBCodezRss:
         -------
         @posts: bs4.element.ResultSet: ResultSet of today's posts
         """
-        print(f'Filtering out {COUNTRY_FILTER[0]}, {COUNTRY_FILTER[1]}, and {COUNTRY_FILTER[2]} while keeping {COUNTRY} and iSPY codes for today...')
+        console.print(f'Filtering out {COUNTRY_FILTER[0]}, {COUNTRY_FILTER[1]}, and {COUNTRY_FILTER[2]} while keeping {COUNTRY} and iSPY codes for today...', style = 'yellow')
         for post in posts:
             try:
                 # keep only 'country' and iSPY current date posts
@@ -147,14 +150,14 @@ def login_SB(email: str, password: str, driver: WebDriver):
     """
     # load cookies into Swagbucks if cookies.pkl is detected
     try:
-        driver.get('https://www.swagbucks.com/')
+        driver.get(SWAGBUCKS_URL)
         cookies = pickle.load(open('cookies.pkl', 'rb'))
         for cookie in cookies:
             driver.add_cookie(cookie)
-        print('Loaded cookies')
+        console.print('Loaded cookies', style='yellow')
     # login into Swagbucks and save cookies to cookies.pkl for future runs of script
     except FileNotFoundError:
-        print('Cookies not found. Logging in and then creating cookies...')
+        console.print('Cookies not found. Logging in and then creating cookies...', style='yellow')
         driver.get('https://www.swagbucks.com/p/login') 
         sleep(3)
         driver.find_element('xpath', '//input[@name=\"emailAddress\"]').send_keys(email)
@@ -164,7 +167,7 @@ def login_SB(email: str, password: str, driver: WebDriver):
         driver.find_element('xpath', '//button[@id="loginBtn"]').click()
         sleep(3) # captcha
         pickle.dump(driver.get_cookies(), open('cookies.pkl', 'wb'))
-        print('Saved cookies as cookies.pkl')
+        console.print('Saved cookies as cookies.pkl', style='green')
     finally:
         sleep(3)
 
@@ -219,41 +222,41 @@ def get_swag_code_offer_page(code: str, link: str) -> str:
     # detect Swag Code in CA/UK/AU
     if COUNTRY in {'CA', 'UK', 'AU'}:
         swag_offer_code = description_split[description_split.index('Swagcode')+2]
-        print('FOUND SWAG CODE:', swag_offer_code)
+        console.print(f'[bold bright_cyan]FOUND SWAG CODE:[/bold bright_cyan] [bold green]{swag_offer_code}[/bold green]')
     # detect Swag Code in US
     else:
         swag_offer_code = description_split[description_split.index('Enter')+1]
-        print('FOUND SWAG CODE:', swag_offer_code)
+        console.print(f'[bold bright_cyan]FOUND SWAG CODE:[/bold bright_cyan] [bold green]{swag_offer_code}[/bold green]')
     # Swag Code is expired
     if swag_offer_code == 'EXPIRED':
-        print(f'Swag Code {code} is expired')
+        console.print(f'Swag Code [bold green]{code}[/bold green] is expired', style='bold yellow')
         return swag_offer_code
     # Swag Code is already redeemed
     elif swag_offer_code == 'This':
-        print(f'Swag Code {code} is not available in your country')
+        console.print(f'Swag Code [bold green]{code}[/bold green] is not available in your country', style='bold yellow')
         return swag_offer_code
     elif swag_offer_code == 'You':
-        print(f'Swag Code {code} has already been redeemed')
+        console.print(f'Swag Code [bold green]{code}[/bold green] has already been redeemed', style='bold yellow')
         return swag_offer_code
     else:
         # if both Mobile App AND SwagButton, but not Swag Code box is described
         if Mobile_App and SwagButton and (Box == False):
-            print(f'Swag Code {swag_offer_code} can only be entered on the Mobile App or SwagButton')
+            console.print(f'Swag Code [bold green]{swag_offer_code}[/bold green] can only be entered on the [cyan2]Mobile App[/cyan2] or [cyan3]SwagButton[/cyan3]', style='white')
             swag_offer_code = 'm/b'
             return swag_offer_code
         # if ONLY Mobile App is described
         elif Mobile_App and (SwagButton == False) and (Box == False):
-            print(f'Swag Code {swag_offer_code} can only be entered on the Mobile App')
+            console.print(f'Swag Code [bold green]{swag_offer_code}[/bold green] can only be entered on the [cyan2]Mobile App[/cyan2]')
             swag_offer_code = 'm'
             return swag_offer_code
         # if ONLY SwagButton is described
         elif (Mobile_App == False) and SwagButton and (Box == False):
-            print(f'Swag Code {swag_offer_code} can only be entered on SwagButton')
+            console.print(f'Swag Code [bold green]{swag_offer_code}[/bold green] can only be entered on [cyan3]SwagButton[/cyan3]')
             swag_offer_code = 'b'
             return swag_offer_code
         # Swag Code box is described or nothing (CA/UK/AU)
         else:
-            print(f'Swag Code {swag_offer_code} can be entered on the website')
+            console.print(f'Swag Code [bold green]{swag_offer_code}[/bold green] can be entered on the [blue1]website[/blue1]')
             return swag_offer_code
 
 def redeem_swag_code(code: str, offer: bool=True):
@@ -267,7 +270,7 @@ def redeem_swag_code(code: str, offer: bool=True):
     """
     # print information about code that is not an offer-page code
     if offer == False:
-        print(f'{code} is a code that can be entered anywhere.')
+        console.print(f'[bold green]{code}[/bold green] is a code that can be entered anywhere.', style='yellow')
     try:
         driver.execute_script("document.getElementById('sbUserMenuToggle').click();")
         driver.execute_script("document.getElementById('sbMainNavUserMenuSwagCodeCta').click();")
@@ -276,11 +279,11 @@ def redeem_swag_code(code: str, offer: bool=True):
         driver.execute_script("document.getElementById('swag-code__submitCta--FSc8Q').click();")
         try:
             message = driver.find_element(By.CLASS_NAME, 'banner__description--uBErz').text
-            print(f'{message} SWAG CODE: {code}')
+            console.print(f'[underline orange1]{message}[/underline orange1] :left-right_arrow: [bold cyan]SWAG CODE:[/bold cyan] [bold green]{code}[/bold green]')
         except NoSuchElementException:
-            print(f'Error retrieving Swagbucks response message after redeeming Swag Code: {code}')
+            console.print(f'Error retrieving Swagbucks response message after redeeming Swag Code: [bold green]{code}[/bold green]', style='red')
     except JavascriptException:
-        print(f'Error redeeming the Swag Code: {code}')
+        console.print(f'Error redeeming the Swag Code: [bold green]{code}[/bold green]', style='red')
 
 def main():
     """
@@ -288,10 +291,10 @@ def main():
     """
     feed = ReadSBCodezRss(URL, headers)
     if feed.codes == []:
-        print('No new Swag codes have been posted today yet')
+        console.print('No new Swag codes have been posted today yet', style='bright_red')
         return
-    print('CODES FOUND:', feed.codes)
-    print('LINKS FOUND:',feed.code_links)
+    console.print(f'[cyan]CODES FOUND:[/cyan] {feed.codes}')
+    console.print(f'[cyan]LINKS FOUND:[/cyan] {feed.code_links}')
 
     code_link_dict = {feed.codes[i]: feed.code_links[i] for i in range(len(feed.codes))}
     #print(code_link_dict)
@@ -303,12 +306,12 @@ def main():
     for code in code_link_dict.keys():
         if search('facebook', code_link_dict[code]) or search('twitter', code_link_dict[code]):
             # non-offer-page Swag Code
-            print(f'DETECTED FACEBOOK / TWITTER / ISPY / EXTRAVAGANZA CODE for {code}')
+            console.print(f'DETECTED FACEBOOK / TWITTER / ISPY / EXTRAVAGANZA CODE for [bold green]{code}[/bold green]', style='magenta')
             driver.get(SWAGBUCKS_URL)
             sleep(2)
             redeem_swag_code(code, offer=False)
         elif search('offer-page', code_link_dict[code]):
-            print(f'DETECTED OFFER PAGE for {code}')
+            console.print(f'DETECTED OFFER PAGE for [bold green]{code}[/bold green]', style='magenta2')
             swag_offer_code = get_swag_code_offer_page(code, code_link_dict[code])
             # if Swag Code is expired, already redeemed, or a Mobile App / SwagButton code
             if swag_offer_code != 'EXPIRED' and swag_offer_code != 'This' and swag_offer_code != 'You' and swag_offer_code != 'm/b' and swag_offer_code != 'm' and swag_offer_code != 'b':
@@ -322,19 +325,19 @@ if __name__ == '__main__':
         while True:
             # Keep running the bot until you stop the bot or some unknown error occurs
             try:
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Fetching sbcodez.com for Swag Codes...")
+                console.print(f"[bold green][{datetime.now().strftime('%H:%M:%S')}][/bold green] [bold yellow]Fetching sbcodez.com for Swag Codes...[/bold yellow]")
                 main()
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Finished running bot this iteration. Fetching again for Swag Codes in 1 hour...")
+                console.print(f"[bold green][{datetime.now().strftime('%H:%M:%S')}][/bold green] [bold yellow]Finished running bot this iteration. Fetching again for Swag Codes in 1 hour...[/bold yellow]")
                 # run again in 1 hour
                 sleep(3600)
             # Ctrl+C to exit bot
             except KeyboardInterrupt:
-                print('\nExiting bot...')
+                console.print('\nExiting bot...', style='bold bright_red', highlight=False)
                 break
             # Exit bot if some unknown error occurs
             except Exception as e:
-                print(e)
-                print('An error occurred. Exiting bot...')
+                console.print(e, style='bold underline red')
+                console.print('An error occurred. Exiting bot...', style='bold bright_red', highlight=False)
                 break
     else:
         # run once
