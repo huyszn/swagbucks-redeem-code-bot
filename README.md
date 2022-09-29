@@ -17,6 +17,12 @@ A bot that scrapes Swag Codes found on sbcodez.com and redeems them on swagbucks
   <b>SwagButton Offer-Page Swag Code</b>
 </p>
 
+![Console output Expired Swag Code](images/Console%20-%20Expired%20Swag%20Code.png)
+
+<p align="center">
+  <b>Bot found Swag Code that is expired and did not attempt to redeem it</b>
+</p>
+
 ## Setup the bot
 
 ### Requirements
