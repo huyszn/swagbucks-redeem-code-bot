@@ -4,12 +4,15 @@ A bot that scrapes Swag Codes found on sbcodez.com and redeems them on swagbucks
 
 ## Examples
 
-![Console output Swag Code Box](images/Console%20-%20Swag%20Code%20Box.png)
-
+![Console output Non-Offer-Page Swag Code Box](images/Console%20-%20Non-Offer-Page%20Swag%20Code%20Box.png)
 <p align="center">
   <b>Swag Code Box Non-Offer-Page Swag Code</b>
 </p>
 
+![Console output Offer-Page Swag Code Box](images/Console%20-%20Offer-Page%20Swag%20Code%20Box.png)
+<p align="center">
+  <b>Swag Code Box Offer-Page Swag Code</b>
+</p>
 
 ![Console output SwagButton](images/Console%20-%20SwagButton.png)
 
